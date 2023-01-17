@@ -30,70 +30,65 @@ headX and headY need to be between 0 and 9
 
 "use strict";
 
+let size = 50; // Checkerboard size variable
 
-let headX = 6;
-let headY = 6;
-let headDir = 0;
+let headX = 5;
+let headY = 5;
+let headXDir = 0;
+let headYDir = 0;
 let frameCount = 0;
 
 
-/**
-Description of setup
-*/
 function setup() {
     createCanvas(500, 500);
 }
 
 
-/**
-Description of draw()
-*/
 function draw() {
-    background(215, 190, 255); // Sets background to black
-    let size = 50; // Initiates size variable
+  background(215, 190, 255); // Sets background to black
 
-    rectMode(CORNER);
-    fill(255, 190, 215); // Sets the colour of the square with a random hue
-    noStroke();
+  rectMode(CORNER);
+  fill(255, 190, 215); // Sets the colour of the square with a random hue
+  noStroke();
   
-    for (let y = 0; y < height/size; y++) { // Loop for the y coordinates
-      for (let x = 0; x < width/size; x++) {  // Loop for the x coordinates
-        if (y%2 - x%2 == 0) { // Code only runs every other square space
-          rect(x*size, y*size, size); // Draws a square
-        }
+  for (let y = 0; y < height/size; y++) { // Loop for the y coordinates
+    for (let x = 0; x < width/size; x++) {  // Loop for the x coordinates
+      if (y%2 - x%2 == 0) { // Code only runs every other square space
+        rect(x*size, y*size, size); // Draws a square
       }
     }
+  }
 
-    //rectMode(CENTER);
-    fill(190, 255, 195);
-    rect(headX * 50 + 7.5, headY * 50 + 7.5, 35, 35, 10);
+  // Draws Snake head
+  fill(190, 255, 195);
+  rect(headX * 50 + 7.5, headY * 50 + 7.5, 35, 35, 10);
 
-    print(frameCount);
-    if (frameCount == 29) {
-        frameCount = 0
+  // Updates snake head position every 30 frames
+  if (frameCount == 29) {
+      frameCount = 0
 
-        if (headDir == 0) {
-          headY -= 1;
-        } else if (headDir == 1) {
-          headX += 1;
-        } else if (headDir == 2) {
-          headY += 1;
-        } else if (headDir == 3) {
-          headX -= 1;
-        }
-    } else {
-      frameCount++;
-    }
-}
-
-function keyPressed() {
-  if (keyCode == UP_ARROW) {
-    headDir = 0;
-  } else if (keyCode == RIGHT_ARROW) {
-    headDir = 1;
-  } else if (keyCode == DOWN_ARROW) {
-    headDir = 2;
-  } else if (keyCode == LEFT_ARROW) {
-    headDir = 3;
+      headX += headXDir;
+      headY += headYDir;
+  } else {
+    frameCount++;
   }
 }
+
+
+// Movement controls for snake head
+function keyPressed() {
+  if (keyCode == UP_ARROW) {
+    headXDir = 0;
+    headYDir = -1;
+  } else if (keyCode == RIGHT_ARROW) {
+    headXDir = 1;
+    headYDir = 0;
+  } else if (keyCode == DOWN_ARROW) {
+    headXDir = 0;
+    headYDir = 1;
+  } else if (keyCode == LEFT_ARROW) {
+    headXDir = -1;
+    headYDir = 0;
+  }
+}
+
