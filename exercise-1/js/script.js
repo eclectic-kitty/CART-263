@@ -15,14 +15,25 @@ We need the following features:
 - Eating apples increases score
 - Increasing number of segments
 - Snake head colliding with segment ends game
+
+        0
+        -
+        |
+ 3 - --   -- + 1
+        |    
+        +
+        2
+
+headX and headY need to be between 0 and 9
 */
+
 
 "use strict";
 
 
-let headX = 25;
-let headY = 25;
-let headDir;
+let headX = 6;
+let headY = 6;
+let headDir = 0;
 let frameCount = 0;
 
 
@@ -53,11 +64,36 @@ function draw() {
       }
     }
 
-    rectMode(CENTER);
+    //rectMode(CENTER);
     fill(190, 255, 195);
-    rect(headX, headY, 35, 35, 10);
+    rect(headX * 50 + 7.5, headY * 50 + 7.5, 35, 35, 10);
 
-    if (frameCount = 9) {
+    print(frameCount);
+    if (frameCount == 29) {
         frameCount = 0
+
+        if (headDir == 0) {
+          headY -= 1;
+        } else if (headDir == 1) {
+          headX += 1;
+        } else if (headDir == 2) {
+          headY += 1;
+        } else if (headDir == 3) {
+          headX -= 1;
+        }
+    } else {
+      frameCount++;
     }
+}
+
+function keyPressed() {
+  if (keyCode == UP_ARROW) {
+    headDir = 0;
+  } else if (keyCode == RIGHT_ARROW) {
+    headDir = 1;
+  } else if (keyCode == DOWN_ARROW) {
+    headDir = 2;
+  } else if (keyCode == LEFT_ARROW) {
+    headDir = 3;
+  }
 }
