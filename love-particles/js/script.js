@@ -3,17 +3,17 @@ List of features:
 - Wandering 🍞
 - Custom circle shape
     - ability to grow
-- Distance sensing
+- Distance sensing 🍞
     - moving towards
         - entering orbit
     - Growing towards each other
-    - Blur
+    - Blur 🍞
     - Colour change
 - Extra colours???
 */
 
 const peeps = []; // array to hold particles
-let peepNum = 10
+let peepNum = 3;
 let maxSize = 40;
 
 let xLim = [];
@@ -22,6 +22,9 @@ let yLim = [];
 function setup() {
     createCanvas(800, 800);
     colorMode(HSB);
+    noStroke();
+    frameRate(30);
+
     xLim = [0 - maxSize, width + maxSize/2];
     yLim = [0 - maxSize/2, height + maxSize/2];
 
@@ -29,7 +32,6 @@ function setup() {
         let newPeep = new Peep(random(width), random(height));
         peeps.push(newPeep);
     }
-    peeps[0].checkCloseness();
 }
 
 
@@ -37,22 +39,27 @@ function draw(){
     background(288, 277, 8);
 
     for (let i = 0; i < peeps.length; i++) {
-        peeps[i].wander();
+        peeps[i].move();
+        peeps[i].mood();
         peeps[i].display();
     }
+    print(frameRate());
 }
 
 // Particle class
 class Peep {
-    constructor(x, y) {
+    constructor(x, y, test) {
         this.x = x;
         this.y = y;
         this.dir = random(259);
         this.colour = color(310, 71, 50);
+        this.lastBlur = 0
 
         this.xoff = random(1000);
         this.yoff = random(1000);
-        this.speed = 5;
+        this.speed = 6;
+
+        this.test = test;
     }
 
     // Displays particle
@@ -61,11 +68,14 @@ class Peep {
         ellipse(this.x, this.y, maxSize);
     }
 
-    wander() {
-        this.x += map(noise(this.xoff), 0, 1, -this.speed, this.speed);
-        this.y += map(noise(this.yoff), 0, 1, -this.speed, this.speed);
-        this.xoff += 0.01
-        this.yoff += 0.01
+    move() {
+        let wander = this.checkWander();
+        let closeness = this.checkCloseness().closeness;
+
+        
+        this.x += wander.x;
+        this.y += wander.y;
+
 
         // Loops screen
         if (this.x < xLim[0]) { // From left edge
@@ -82,20 +92,55 @@ class Peep {
         }
     }
 
+    // Calculates change in movement, wandery
+    checkWander() {
+        let xWander = map(noise(this.xoff), 0, 1, -this.speed, this.speed);
+        let yWander = map(noise(this.yoff), 0, 1, -this.speed, this.speed);
+        this.xoff += 0.01;
+        this.yoff += 0.01;
+
+        let wander = { x: xWander, y: yWander};
+        return wander;
+    }
+
+    // Calculates closeness to nearest particle
     checkCloseness() {
+        let partner = {id: this, closeness: width};
         for (let i = 0; i < peeps.length; i++) {
             if (peeps[i] != this) {
-                let closeness = dist(this.x, this.y, peeps[i].x, peeps[i].y);
-                print(closeness);
+                let d = dist(this.x, this.y, peeps[i].x, peeps[i].y);
+                if (partner.closeness > d) { 
+                    partner.id = peeps[i];
+                    partner.closeness = d;
+                }
+
             }
         }
+        return partner;
+    }
+
+    // Changes visual elements of particle
+    mood() {
+        // First part focuses on blur
+
+        let closeness = this.checkCloseness().closeness; // checks distance from nearest particle
+        let blur = round(closeness/50, 1); // blur amount is set relative to closeness
+        // If the change from last blur is too large (such as when a particle crosses the screen), 
+        if (this.lastBlur - blur > 1 || this.lastBlur - blur < -1) {
+            blur = lerp(this.lastBlur, blur, 0.1); // They are lerped to prevent sudden changes
+        }
+        drawingContext.filter = 'blur(' + String(blur) + 'px)'; // blur is applied
+        this.lastBlur = blur // Current blur is recorded
+
+        // Second part focuses on the colour
+
+
     }
 }
 
 
 // Function for testing creating particles
 function mousePressed() {
-    let newPeep = new Peep(mouseX, mouseY);
-    //let newPeep = new Peep();
+    let newPeep = new Peep(mouseX, mouseY, true);
     peeps.push(newPeep);
 }
