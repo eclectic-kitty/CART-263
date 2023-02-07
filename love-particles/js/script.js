@@ -4,10 +4,13 @@ List of features:
 - Custom circle shape
     - ability to grow
 - Distance sensing 🍞
-    - moving towards each other
-        - within certain threshold
-        - get position of partner
-        - interpolate position towards partner
+    - moving towards each other 
+        - within certain threshold 🍞
+        - get position of partner 🍞
+        - move less along wnader + more along path 🍞
+        - next threshold,
+        - establish center point
+        - move towards orbit
     - Growing towards each other
     - Blur 🍞
     - Colour change
@@ -15,7 +18,7 @@ List of features:
 */
 
 const peeps = []; // array to hold particles
-let peepNum = 4;
+let peepNum = 6;
 let maxSize = 40;
 let speed = 3;
 
@@ -67,16 +70,19 @@ class Peep {
     }
 
     move() {
-        let closeness = this.checkCloseness().close;
+        let closeness = this.getCloseness().close;
         let dir = createVector(0, 0);
-        let wander = this.checkWander();
-        let pathToPart = this.checkPathToPart();
+        let wander = this.getWander();
+        let pathToPart = this.getPathToPart();
+        let orbit = this.getOrbit();
 
-        if (closeness < 200) {
-            wander.setMag(wander.mag() * (closeness/800) + 0.75);
+        if (closeness < 200 && closeness > maxSize*2) {
+            wander.setMag(wander.mag() * (closeness/200));
             pathToPart.setMag(-(closeness/800)+0.25);
             dir = p5.Vector.add(wander, pathToPart);
             dir.setMag(dir.mag()*speed);
+        } else if (closeness < maxSize * 2) {
+
         } else {
             dir = wander;
             dir.setMag(wander.mag() * speed);
@@ -102,15 +108,7 @@ class Peep {
     }
 
     // Calculates change in movement, wandery
-    checkWander() {
-        /*
-        let preWander = createVector(0, 0);
-        preWander.x = map(noise(this.xoff), 0, 1, -1, 1);
-        preWander.y = map(noise(this.yoff), 0, 1, -1, 1);
-        preWander.limit(1);
-
-        let wander = {dir: p5.Vector.normalize(preWander), mag: preWander.mag()};
-        */
+    getWander() {
         let wander = createVector(0, 0);
         wander.x = map(noise(this.xoff), 0, 1, -1, 1);
         wander.y = map(noise(this.yoff), 0, 1, -1, 1);
@@ -123,16 +121,20 @@ class Peep {
         return wander;
     }
 
-    checkPathToPart() {
-        let info = this.checkCloseness()
+    getPathToPart() {
+        let info = this.getCloseness()
 
         let vecToPart = p5.Vector.sub(info.part.pos, this.pos);
         vecToPart.normalize();
         return vecToPart
     }
 
+    getOrbit() {
+        let info = this.getCloseness()
+    }
+
     // calculates distance from nearest particle
-    checkCloseness() {
+    getCloseness() {
         let info = {part: this, close: width}; // Object to hold nearest particle & distance from it
         for (let i = 0; i < peeps.length; i++) {
             if (peeps[i] != this) { // Runs on all particles other than itself
@@ -149,7 +151,7 @@ class Peep {
     // Changes visual elements of particle
     mood() {
         // First part focuses on blur
-        let closeness = this.checkCloseness().close; // checks distance from nearest particle
+        let closeness = this.getCloseness().close; // gets distance from nearest particle
         let blur = round(closeness/50, 1); // blur is set relative to closeness
 
         // If the change from last blur is too large (such as when a particle crosses the screen), 
