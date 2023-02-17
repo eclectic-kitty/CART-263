@@ -65,6 +65,7 @@ class Peep {
         this.speed = 6; // Speed at which they move
         this.size = size; // size of particles
         this.colour = palette[0]; // Sets initial colour
+        this.lastColour = 0;
         this.lastBlur = 0 // initialises variable to keep track of blur
 
         // Offset variables for noise
@@ -189,7 +190,7 @@ class Peep {
         }
 
         // For testing
-        ellipse(this.orbit.centre.x, this.orbit.centre.y, 5);
+        //ellipse(this.orbit.centre.x, this.orbit.centre.y, 5);
     }
 
     // calculates distance from nearest particle
