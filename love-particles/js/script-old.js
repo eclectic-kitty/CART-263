@@ -35,7 +35,7 @@ function draw(){
 }
 
 class Peep {
-    constructor(x, y) {
+    constructor(x, y, test) {
         this.pos = createVector(x, y); // vector that represents particle's position
         this.speed = 6; // speed at which particles will move
         this.size = 60; // size of particles
@@ -52,6 +52,12 @@ class Peep {
         // Initializes offset variables for noise
         this.xoff = random(1000);
         this.yoff = random(1000);
+        
+        // Not important yet
+        this.orbit = {centre: 0, path: 0};
+        this.testLine = createVector(0, 0);
+
+        this.test = test;
     }
 
     // Displays particle
@@ -72,22 +78,48 @@ class Peep {
     move() {
         let closeness = this.getCloseness().close; // Gets distance from enarest particle
         let dir = createVector(0, 0); // Initialises direction to move in
+        let wander = this.getWander(); // Gets wandering direction
 
-        // If particle is close to another. but not too close
+        // // If particle is close to another
+        // if (closeness < 200 && closeness > this.size*2) { 
+        //     let pathToPart = this.getPathToPart(); // Gets path to nearest particle
+        //     pathToPart = pathToPart.normalize() // Normalizes this path
+
+        //     wander.setMag(wander.mag() * (closeness/200)); // Sets magnitude of wander path, stronger the further from other
+        //     pathToPart.setMag(-(closeness/800)+0.25); // Sets magnitude of path to other, stronger the closer
+        //     dir = p5.Vector.add(wander, pathToPart); // Adds both paths to the direction
+        //     dir.setMag(dir.mag()*this.speed); // Adjusts magnitude of direction to speed
+        // // If the particle is not close to any other
+        // } else {
+        //     dir = wander;
+        //     dir.setMag(wander.mag() * this.speed);
+        // }
+
+        // If particle is close to another
         if (closeness < 300 && closeness > this.size*2) { 
-            let wander = this.getWander(); // Gets wandering direction
-            let pathToPart = this.getPathToPart(); // Gets path to nearest particle as a vector
+            let pathToPart = this.getPathToPart(); // Gets path to nearest particle
+            pathToPart = pathToPart.normalize() // Normalizes this path
 
-            wander.setMag(wander.mag() * (closeness/300)); // Sets magnitude of wander path, stronger the further from other particle
-            pathToPart.setMag(-(closeness/1200)+0.25); // Sets magnitude of path to other, stronger the closer to other particle
-            dir = p5.Vector.add(wander, pathToPart); // Adds both path vectors to the direction
+            wander.setMag(wander.mag() * (closeness/300)); // Sets magnitude of wander path, stronger the further from other
+            pathToPart.setMag(-(closeness/1200)+0.25); // Sets magnitude of path to other, stronger the closer
+            dir = p5.Vector.add(wander, pathToPart); // Adds both paths to the direction
             dir.setMag(dir.mag()*this.speed); // Adjusts magnitude of direction to speed
+        // If the particle gets very close to another
+        // } else if (closeness < this.size*1.5+10) {
+        //     this.getOrbit();
+        // If the particle is not close to any other
         } else {
             dir = wander;
             dir.setMag(wander.mag() * this.speed);
         }
 
+        if (closeness < this.size*2) {
+            this.getOrbit();
+        }
+
+
         this.pos.add(dir);
+
 
         // Loops screen
         if (this.pos.x < this.xLim[0]) { // From left edge
@@ -102,6 +134,7 @@ class Peep {
         if (this.pos.y > this.yLim[1]) { // From bottom edge
             this.pos.y = this.yLim[0]; // to top edge
         }
+        
     }
 
     // Gets path for wandering
@@ -123,9 +156,22 @@ class Peep {
     getPathToPart() {
         let info = this.getCloseness() // Gets closest particle & distance to it
 
-        let vecToPart = p5.Vector.sub(info.part.pos, this.pos); // Calculates vector from self to nearest particle
-        pathToPart = pathToPart.normalize() // Normalizes this path vector
+        let vecToPart = p5.Vector.sub(info.part.pos, this.pos); // Calculates vector from particle to nearest
         return vecToPart
+    }
+
+    getOrbit() {
+        let info = this.getCloseness()
+
+        if (!info.part.orbit.centre) {
+            let vecToCentre = this.getPathToPart();
+
+            vecToCentre = vecToCentre.setMag(vecToCentre.mag()*0.5);
+            this.orbit.centre = p5.Vector.add(this.pos, vecToCentre);
+        }
+
+        // For testing
+        ellipse(this.orbit.centre.x, this.orbit.centre.y, 5);
     }
 
     // calculates distance from nearest particle
@@ -156,12 +202,19 @@ class Peep {
         this.lastBlur = blur // Current blur is recorded
 
         // Second part focuses on the colour
-        if (closeness > 300) { // If far from any other particle,
-            this.colour = this.outColour; // colour is set to the darker foclour
-        } else { // If closer
-            let lerpVal = map(closeness, 60, 300, 1, 0) // A lerp position/amount is set from how close self is to other particle
-            this.colour = lerpColor(this.outColour, this.inColour, lerpVal) // And the colour is assigned, the closer, the closer to the lighter colour
+        if (closeness > 300) {
+            this.colour = this.outColour;
+        } else if (closeness > this.size * 1.5) {
+            let lerpVal = map(closeness, 60, 300, 1, 0)
+            this.colour = lerpColor(this.outColour, this.inColour, lerpVal)
         }
 
     }
+}
+
+
+// Function for testing creating particles
+function mousePressed() {
+    let newPeep = new Peep(mouseX, mouseY, true);
+    peeps.push(newPeep);
 }
