@@ -2,8 +2,6 @@
 // API URL: http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=fc29072d5368e2cf9e7b26a7b59da0f6&artist=" + + "&album=" + + "&format=json"
 
 let hist;
-let covers = [];
-//let row = 226;
 
 let artist;
 let album;
@@ -31,7 +29,6 @@ function setup() {
 
 function draw() {
     if (ready && albumCount < albumNum) {
-        //console.log("getting album");
         getAlbumJSON();
     } else if (albumCount == albumNum && !done) {
         console.log("done!");
@@ -74,8 +71,6 @@ function preparePath (albumJSON) {
 }
 
 function displayCover (cover) {
-    // covers.push(album);
-    // covers.push(cover);
     albumCount++;
 
     image(cover, colCount * 34, rowCount * 34);
@@ -93,8 +88,6 @@ function wompWomp () {
     loadImage('assets/images/womp.png', displayCover);
     console.log('womp womp');
     console.log(artist + " - " + album);
-    //albumCount++;
-    //ready = true;
 }
 
 function mouseClicked() {
