@@ -1,43 +1,51 @@
-let hist;
-let albums = [];
-let albumsTable
-let numRows;
+/* Script for listing all the albums from my listening history
+This list can then be downloaded as a csv file by clicking on the canvas
+*/
+
+let hist; // Variable to hold listening history table
+//let albums = []; // Array to hold list of albums
+let albumsTable; // Variable to hold table that will be outputted
 
 function preload() {
-    hist = loadTable('assets/listen-history.csv', 'csv');
-    albumsTable = new p5.Table()
-    albumsTable.addColumn();
-    albumsTable.addColumn();
+    hist = loadTable('assets/listen-history.csv', 'csv'); // Loads the listening history table
+    albumsTable = new p5.Table() // Creates the output table
+    for (i=0;i<2;i++) {albumsTable.addColumn();} // Creates the table's two columns
 }
 
+// As the script only needs to run one, I run it all in setup
 function setup() {
+    createCanvas(windowWidth, windowHeight);
+    background(0);
 
+    // Runs once per row in listening history table
+    for (r = 0; r < hist.getRowCount(); r++) {
+        let currAlbum = [hist.getString(r, 0), hist.getString(r, 1)]; // Records current row's artist and album in an array
 
-    numRows = hist.getRowCount();
-
-    for (r = 0; r < numRows; r++) {
-        //, hist.getString(r, 3)
-        let currAlbum = [hist.getString(r, 0), hist.getString(r, 1)]; //currAlbum array contains [artist, album]
-
-        for (i = 0; i < albums.length; i++) {
-            if (currAlbum[1] == albums[i][1]) { // currAlbum[0] == albums[i][0] && currAlbum[1] == albums[i][1
-                currAlbum = 0;
+        // Runs once per row in output table
+        for (i = 0; i < albumsTable.getRowCount(); i++) {
+            // Checks if current album is already listed in output table
+            if (currAlbum[1] == albumsTable.getString(i, 1)) { 
+                currAlbum = 0; // If it is, currAlbum is written over with 0
             }
         }
 
+        // If currAlbum is truthy, ie. still contains text
         if (currAlbum) {
-            //console.log('yo');
-            let albumRow = albumsTable.addRow()
+            let albumRow = albumsTable.addRow() // Creates new row in output table
+            // Adds artist and album to new row
             for (i = 0; i < currAlbum.length; i++) {
                 albumRow.set(i, currAlbum[i]);
             }
-            currAlbum.push(albums.length);
-            albums.push(currAlbum);
         }
     }
-    console.log(albums);
-    console.log(albumsTable);
-    text('ready!', 10, 10);
+
+    textAlign(CENTER); // Aligns text to center
+    fill(255); // Sets text colour to white
+    text('Ready! Click to download!', width/2, height/2); // Tells user table is ready to dowload
+}
+
+// Downloads table on click
+function mouseClicked() {
     save(albumsTable, 'albums.csv');
 }
 
@@ -55,21 +63,3 @@ function setup() {
 // However, with the former, I'm undercounting some 40 albums. 
 // My guess is the singles? Perhaps the odd album with the same name?
 // this has been figured out, see above
-
-// DID NOT WORK, MADE IT CRASH WHEN IT GOT TO THE THIRD ALBUM // EDIT: fixed
-// Couldn't figure out why, but whenever it started comparing a third album against two existing ones in the list,
-// it began to endlessly loop the for loop outside the if, even though albums.length did not increase past 2
-// heavily simplified from top answer on https://stackoverflow.com/questions/7837456/how-to-compare-arrays-in-javascript
-// LATER: Ok, I figured it out a little bit more. I was using i for the for loop in here, which I was also using for
-// the other for loop. Not going to follow th elogic past that tbh.
-// Stopped working again later? Never returned true
-function sameArray(a, b) {
-    for (j = 0; j < b.length; j++) {
-        if (a[j] != b[j]) {
-            return false;
-        }
-    }
-    return true;
-}
-
-// sameArray(currAlbum, albums[i])
