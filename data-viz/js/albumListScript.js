@@ -1,4 +1,4 @@
-/* Script for listing all the albums from my listening history
+/* Script for listing the albums from my listening history
 This list can then be downloaded as a csv file by clicking on the canvas
 */
 

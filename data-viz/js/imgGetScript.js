@@ -1,8 +1,7 @@
 /* Script for fetching album covers from last.fm
-To be able to see the covers as they come in, I've set it up to only fetch 500 at a time
-Thus, it must run 3 times to fetch the full 1500 covers I've included in my project
 Once script is finished, the covers are all displayed in the canvas, which can be downloaded by clicking on the canvas
-
+Script takes at least a few minutes to run, as the API calls & donwloading the images takes a little while
+I've set it to only download 1500 covers at the time, as that is roughly the amount I've listened to in the past year
 */
 
 // My API key: fc29072d5368e2cf9e7b26a7b59da0f6
