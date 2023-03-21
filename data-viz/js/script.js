@@ -5,97 +5,69 @@ Arrange covers as a sound wave, each line is a week, top is brighter coloured, l
 
 */
 
-let covers = [];
-let hist;
-let albumInv
+let albums = []; // Array to contain album objects
+let hist; // Variable to contain listening history
+let albumInv; // Variable to contain albums index
+let covers = []; // Array to contain cover images
+
+let colIndex = 0; // column index variable for displaying covers
+let rowIndex = 0; // row index variable for displaying covers
 
 function preload() {
-    hist = loadTable('assets/listen-history.csv');
-    albumInv = loadTable('assets/albums.csv');
+    hist = loadTable('assets/listen-history.csv'); // Load listening history
+    albumInv = loadTable('assets/albums.csv'); // Load albums index
+
+    // Load cover images
+    for (let i = 0; i < 1500; i++) {
+        let path = 'assets/images/covers/' + i + '.png';
+        let cover = loadImage(path);  
+        covers.push(cover);
+    }
 }
 
 function setup() {
-    console.log(covers);
+    createCanvas(340, 340);
+    background(0);
+    angleMode(DEGREES); // This is for calculating hue averages
 
-    for (i = 0; i < 1500; i++) { // If just displaying covers, period, = 1499, < -1, i--
-        let album = new Album(i);
+    // Create album objects
+    for (let i = 0; i < 1500; i++) {
+        let album = new Album(i); // Index is passed along to get cover image & title
         console.log(album);
-        covers.push(album);
+        albums.push(album);
     }
 }
 
 // function setup() {
-//     angleMode(DEGREES);
-//     createCanvas(1500, 700);
-//     background(175);
-  
-//     // for (i = 0; i < covers.length; i++) {
-//     //     covers[i].loadPixels();
-//     //     let pix = covers[i].pixels;
-//     //     for (j = 0; j < (pix.length/4); j++)
-//     //     covers[i].pixels
-//     // }
-//     for (i = 0; i < covers.length; i++) {
-//         covers[i].img.loadPixels(); // Loads pixels from image
-//         let pix = covers[i].img.pixels; // reference to pixels
-
-//         // Initialising variables to keep track of value totals for avg calculation
-//         let hues = createVector(0, 0); // hues has to be a vector for math reasons
-//         let saturations = 0;
-//         let lightnesses = 0;
-
-//         for (j = 0; j < (pix.length / 4); j++) { // per pixel
-//             let r = pix[j*4]; // gets red value
-//             let g = pix[j*4+1]; // gets green value
-//             let b = pix[j*4+2]; // gets blue value
-//             let pixCol = color(r, g, b); // creates colour from them
-
-//             lightnesses += round(lightness(pixCol)); // Adds together lightnesses
-//             saturations += round(saturation(pixCol)); // Adds together saturations for displaying by saturation
-//             if (lightness(pixCol) > 10 && lightness(pixCol) < 90) {
-//                 angle = round(hue(pixCol));
-//                 hues.add(createVector(cos(angle), sin(angle)))
-
-//                 //saturations += round(saturation(pixCol)); // For displaying by hue
-//             }
-//         }
-//         let avgHue = atan2(hues.y, hues.x);
-//         if (avgHue < 0) {avgHue += 360;39290}
-//         let avgSat = saturations / (pix.length / 4);
-//         let avgLight = lightnesses / (pix.length / 4);
-//         covers[i].hue = avgHue;
-//         covers[i].sat = avgSat;
-//         covers[i].light = avgLight;
-//         //console.log(albums.getString(i, 1) + ' - ' + covers[i].hue + ', ' + covers[i].sat + ', ' + covers[i].light);
 
 //         //Displaying by hue
-//         // if (covers[i].sat < 6) { // && (covers[i].light < 10 || covers[i].light > 90)
-//         //     image(covers[i].img, map(covers[i].light, 0, 100, 34, width) - 34, random((height - height/5) - 34, height-34));
+//         // if (albums[i].sat < 6) { // && (albums[i].light < 10 || albums[i].light > 90)
+//         //     image(albums[i].img, map(albums[i].light, 0, 100, 34, width) - 34, random((height - height/5) - 34, height-34));
 //         // } else {
-//         //     image(covers[i].img, map(covers[i].hue, 0, 360, 34, width) - 34, random((height - height/5) -84));
+//         //     image(albums[i].img, map(albums[i].hue, 0, 360, 34, width) - 34, random((height - height/5) -84));
 //         // }
 
 //         // Displaying by saturation or lightness
-//         image(covers[i].img, map(covers[i].sat, 0, 100, 34, width) - 34, random(height-34));
+//         image(albums[i].img, map(albums[i].sat, 0, 100, 34, width) - 34, random(height-34));
 //     }
 
 //     let pastDay = hist.getString(0, 0).slice(0, 11)
 //     let dayDiff = 0;
-//     let albums = [];
-//     for (i = 0; i < 1567; i++) {
+//     let albumsss = [];
+//     for (let i = 0; i < 1567; i++) {
 //         let currDay = hist.getString(i, 3).slice(0, 11);
 
 //         let currAlbum = hist.getString(i, 1);
 //         let unique = true;
-//         for (j = 0; j < albums.length; j++) {
-//             if (currAlbum == albums[j].title) {
+//         for (let j = 0; j < albumsss.length; j++) {
+//             if (currAlbum == albumsss[j].title) {
 //                 unique = false;
-//                 albums[j].count++;
+//                 albumsss[j].count++;
 //             }
 //         }
 //         if (unique) {
 //             let index = 0;
-//             for (j = 0; j < albumInv.getRowCount(); j++) {
+//             for (let j = 0; j < albumInv.getRowCount(); j++) {
 //                 let titleTable = albumInv.getString(j, 1)
 //                 titleTable = titleTable.replaceAll('`', '');
 //                 titleTable = titleTable.replaceAll('^', '');
@@ -104,7 +76,7 @@ function setup() {
 //                     break;
 //                 }
 //             }
-//             albums.push( {title: currAlbum, count: 0, coverIndex: index} );
+//             albumsss.push( {title: currAlbum, count: 0, coverIndex: index} );
 //         }
 
 //         if (currDay != pastDay) { dayDiff++; } 
@@ -113,9 +85,9 @@ function setup() {
 //         // }
 //     }
 
-//     // for (i = 0; i < albums.length; i++) {
-//     //     let cover = covers[albums[i].coverIndex];
-//     //     //console.log(albums[i]);
+//     // for (let i = 0; i < albumsss.length; i++) {
+//     //     let cover = albums[albumsss[i].coverIndex];
+//     //     //console.log(albumsss[i]);
 //     //     let x = 0;
 //     //     let y = 0;
 //     //     if (cover.sat > 6) {
@@ -125,27 +97,62 @@ function setup() {
 //     //         x = map(cover.light, 0, 100, 34, width) - 34;
 //     //         y = random((height - height/5) - 34, height-34);
 //     //     }
-//     //     for (j = 0; j < albums[i].count; j++) {
+//     //     for (let j = 0; j < albumsss[i].count; j++) {
 //     //         image(cover.img, x + random(-20, 20), y + random(-20, 20));
 //     //     }
 //     // }
-//     //console.log(covers[1]);
+//     //console.log(albums[1]);
 // }
 
 class Album {
     constructor(index) {
-        let path = 'assets/images/' + index + '.png';
-        this.cover = loadImage(path);
+        this.cover = covers[index];
         
         let rawTitle = albumInv.getString(index, 1)
+        // Remove special characters used for API calls in setup script
         rawTitle = rawTitle.replaceAll('`', '');
         rawTitle = rawTitle.replaceAll('^', '');
         this.title = rawTitle;
 
-        this.avgColour = this.calcAvgCol();
+        let avgColour = this.calcAvgCol() // gets average colour array
+        this.avgHue = avgColour[0];
+        this.avgSat = avgColour[1];
+        this.avgLight = avgColour[2];
     }
 
+    // Calculates cover's average colour, returns array with hsl values
     calcAvgCol() {
-        return 3;
+        this.cover.loadPixels(); // Loads pixels from image
+        let pix = this.cover.pixels; // reference to pixels
+        //console.log(pix);
+
+        // Initialising variables to keep track of hsl totals for avg calculation
+        let saturations = 0;
+        let lightnesses = 0;
+        // Hue is different as it's not a linear value from 1 - 100, but a degree on a circle
+        // These angles can be seen as vectors on a unit circle though
+        // The average vector of these, turned back into an angle, is then the answer I'm lookinn for
+        let hues = createVector(0, 0);
+
+        for (let i = 0; i < (pix.length / 4); i++) { // runs once per pixel
+            let r = pix[i*4]; // gets red value
+            let g = pix[i*4+1]; // gets green value
+            let b = pix[i*4+2]; // gets blue value
+            let pixCol = color(r, g, b); // creating a colour object from rgb values
+
+            lightnesses += lightness(pixCol); // Adds lightness of current pixel
+            //saturations += round(saturation(pixCol)); // Adds together saturations for displaying by saturation
+            if (lightness(pixCol) > 10 && lightness(pixCol) < 90) { // If pixel isn't black or white
+                hues.add(createVector(cos(hue(pixCol)), sin(hue(pixCol)))) // Adds hue of current pixel
+                saturations += saturation(pixCol); // Adds saturation of current pixel
+            }
+        }
+        // I don't fully understand the math here, ie. how atan2 gets the angle of the sum of the vectors
+        // This is where I got it from though: 
+        let avgHue = atan2(hues.y, hues.x); 
+        if (avgHue < 0) {avgHue += 360;} // atan2 returns an angle from -180 to 180, so this wraps the negative values back around
+        let avgSat = saturations / (pix.length / 4); // Calculating average saturation
+        let avgLight = lightnesses / (pix.length / 4); // Calculating average lightness
+        return [avgHue, avgSat, avgLight];
     }
 }
