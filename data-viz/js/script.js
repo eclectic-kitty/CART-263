@@ -1,17 +1,24 @@
-/*
-Ideas for visualisation
-#1: Sound wave
-Arrange covers as a sound wave, each line is a week, top is brighter coloured, lower is darker coloured
+/* The Colour of Sound
+Aurora Becerra Granados
+for CART 263
 
+This script analyses a set of album covers from my own personal listening history
+The average hue, saturation and lightness of each cover is calculated
+The covers can then be arranged along any of these parameters
+*/
+
+/*
+I have a hue from 0 - 360
+
+I need th eformula of a circle I think?
 */
 
 let albums = []; // Array to contain album objects
 let hist; // Variable to contain listening history
 let albumInv; // Variable to contain albums index
 let covers = []; // Array to contain cover images
+let hueRad = 400;
 
-let colIndex = 0; // column index variable for displaying covers
-let rowIndex = 0; // row index variable for displaying covers
 
 function preload() {
     hist = loadTable('assets/listen-history.csv'); // Load listening history
@@ -26,9 +33,10 @@ function preload() {
 }
 
 function setup() {
-    createCanvas(340, 340);
+    createCanvas(1500, 1500);
     background(0);
     angleMode(DEGREES); // This is for calculating hue averages
+    let hueCenter = createVector(width / 2, height / 2);
 
     // Create album objects
     for (let i = 0; i < 1500; i++) {
@@ -36,21 +44,17 @@ function setup() {
         console.log(album);
         albums.push(album);
     }
+
+    // Display albums
+    for (let i = 0; i < albums.length; i++) {
+        let posVec = createVector(sin(albums[i].avgHue) * hueRad, cos(albums[i].avgHue) * hueRad); 
+        posVec = posVec.mult(map(albums[i].avgSat, 0, 100, 0.5, 1.5));
+        posVec.add(hueCenter);
+        image(albums[i].cover, posVec.x, posVec.y);
+    }
 }
 
 // function setup() {
-
-//         //Displaying by hue
-//         // if (albums[i].sat < 6) { // && (albums[i].light < 10 || albums[i].light > 90)
-//         //     image(albums[i].img, map(albums[i].light, 0, 100, 34, width) - 34, random((height - height/5) - 34, height-34));
-//         // } else {
-//         //     image(albums[i].img, map(albums[i].hue, 0, 360, 34, width) - 34, random((height - height/5) -84));
-//         // }
-
-//         // Displaying by saturation or lightness
-//         image(albums[i].img, map(albums[i].sat, 0, 100, 34, width) - 34, random(height-34));
-//     }
-
 //     let pastDay = hist.getString(0, 0).slice(0, 11)
 //     let dayDiff = 0;
 //     let albumsss = [];
@@ -118,6 +122,8 @@ class Album {
         this.avgHue = avgColour[0];
         this.avgSat = avgColour[1];
         this.avgLight = avgColour[2];
+
+        this.count = 0;
     }
 
     // Calculates cover's average colour, returns array with hsl values
