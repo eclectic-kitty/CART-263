@@ -20,13 +20,11 @@ I think hue doesn't make a big difference if separated
 */
 
 let albums = []; // Array to contain album objects
-let hist; // Variable to contain listening history
 let albumInv; // Variable to contain albums index
 let covers = []; // Array to contain cover images
-let modes = ['lightness', 'saturation'];
+let modes = ['lightness', 'saturation']; // Array with two display modes
 
 function preload() {
-    hist = loadTable('assets/listen-history.csv'); // Load listening history
     albumInv = loadTable('assets/albums.csv'); // Load albums index
 
     // Load cover images
@@ -45,8 +43,7 @@ function setup() {
     // Create album objects
     for (let i = 0; i < 1500; i++) {
         let album = new Album(i); // Index is passed along to get cover image & title
-        console.log(album);
-        albums.push(album);
+        albums.push(album); // and the album is added to the array of albums
     }
 
     drawCovers();
@@ -61,14 +58,12 @@ function drawCovers() {
         let hueCenter = createVector(width / 2, height / 2); // Variable for the center of the circle of album covers
     
         let posVec = createVector(sin(albums[i].avgHue) * hueRad, cos(albums[i].avgHue) * hueRad); // Sets x and y position along circle of album cover by calculating vector from the hue (angle)
-
         // The 'if' statement here separates the two modes
         if (modes[0] == 'lightness') {
-            posVec = posVec.mult(map(albums[i].avgLight, 0, 100, 2.5, 0)) // Varies magnitude of vector, ie. distance from center based on lightness. Darkest at edges, lightest at center
+            posVec = posVec.mult(map(albums[i].avgLight, 0, 100, 2, 0)) // Varies magnitude of vector, ie. distance from center based on lightness. Darkest at edges, lightest at center
         } else if (modes[0] == 'saturation') {
-            posVec = posVec.mult(map(albums[i].avgSat, 0, 100, 0, 2.5)); // Same as above, but based on saturation. Most saturated at edges, least in center.
+            posVec = posVec.mult(map(albums[i].avgSat, 0, 100, 0, 2)); // Same as above, but based on saturation. Most saturated at edges, least in center.
         }
-
         posVec.add(hueCenter); // Places circle at defined center
 
         image(albums[i].cover, posVec.x, posVec.y); // Display cover
@@ -79,7 +74,7 @@ function drawCovers() {
 function keyPressed() {
     if (keyCode == 32) {
         modes.reverse(); // Changes mode
-        drawCovers();
+        drawCovers(); // Redraws covers
     }
 }
 
@@ -94,19 +89,16 @@ class Album {
         this.title = rawTitle; // Set title
 
         let avgColour = this.calcAvgCol() // Gets array with cover's average colour in HSL
-
+        // Values for average hue, saturation and lightness are set here.
         this.avgHue = avgColour[0];
         this.avgSat = avgColour[1];
         this.avgLight = avgColour[2];
-
-        this.count = 0;
     }
 
     // Calculates cover's average colour, returns array with values in HSL
     calcAvgCol() {
         this.cover.loadPixels(); // Loads pixels from image
         let pix = this.cover.pixels; // reference to pixels
-        //console.log(pix);
 
         // Initialising variables to keep track of hsl totals for avg calculation
         let saturations = 0;
@@ -142,16 +134,24 @@ class Album {
     }
 }
 
+/* Ahead is code I wrote for extra features.
+It is neither finished nor completed, but I'm leaving it here in case I want to return to this project later.
+More details on the features in the readme file!
+*/
+
+// let hist; // Variable to contain listening history
+// hist = loadTable('assets/listen-history.csv'); // Load listening history
+
 // function setup() {
 //     let pastDay = hist.getString(0, 0).slice(0, 11)
 //     let dayDiff = 0;
-//     let albumsss = [];
+//     let albums = [];
 //     for (let i = 0; i < 1567; i++) {
 //         let currDay = hist.getString(i, 3).slice(0, 11);
 
 //         let currAlbum = hist.getString(i, 1);
 //         let unique = true;
-//         for (let j = 0; j < albumsss.length; j++) {
+//         for (let j = 0; j < albums.length; j++) {
 //             if (currAlbum == albumsss[j].title) {
 //                 unique = false;
 //                 albumsss[j].count++;
@@ -168,7 +168,7 @@ class Album {
 //                     break;
 //                 }
 //             }
-//             albumsss.push( {title: currAlbum, count: 0, coverIndex: index} );
+//             albums.push( {title: currAlbum, count: 0, coverIndex: index} );
 //         }
 
 //         if (currDay != pastDay) { dayDiff++; } 
