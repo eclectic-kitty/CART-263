@@ -1,4 +1,4 @@
-/* The Colour of Sound
+/* Tone Colour
 Aurora Becerra Granados
 for CART 263
 
@@ -8,17 +8,20 @@ The covers can then be arranged along any of these parameters
 */
 
 /*
-I have a hue from 0 - 360
+Extras:
+- switch between organising by saturation, lightness, and separate greyscale
+- y axis for quantity?
+- count changing size
+- larger things in the back
 
-I need th eformula of a circle I think?
 */
 
 let albums = []; // Array to contain album objects
 let hist; // Variable to contain listening history
 let albumInv; // Variable to contain albums index
 let covers = []; // Array to contain cover images
-let hueRad = 400;
 
+let updated = false;
 
 function preload() {
     hist = loadTable('assets/listen-history.csv'); // Load listening history
@@ -26,17 +29,16 @@ function preload() {
 
     // Load cover images
     for (let i = 0; i < 1500; i++) {
-        let path = 'assets/images/covers/' + i + '.png';
-        let cover = loadImage(path);  
-        covers.push(cover);
+        let path = 'assets/images/covers/' + i + '.png'; // path to images
+        let cover = loadImage(path); // Loads covers
+        covers.push(cover); // Adds them to array
     }
 }
 
 function setup() {
     createCanvas(1500, 1500);
     background(0);
-    angleMode(DEGREES); // This is for calculating hue averages
-    let hueCenter = createVector(width / 2, height / 2);
+    angleMode(DEGREES); // This is for calculating hue averages later
 
     // Create album objects
     for (let i = 0; i < 1500; i++) {
@@ -44,13 +46,25 @@ function setup() {
         console.log(album);
         albums.push(album);
     }
+}
 
+function drawCovers() {
     // Display albums
-    for (let i = 0; i < albums.length; i++) {
-        let posVec = createVector(sin(albums[i].avgHue) * hueRad, cos(albums[i].avgHue) * hueRad); 
-        posVec = posVec.mult(map(albums[i].avgSat, 0, 100, 0.5, 1.5));
-        posVec.add(hueCenter);
-        image(albums[i].cover, posVec.x, posVec.y);
+    for (let i = albums.length - 1; i > 0; i--) { // Runs once per album
+        let hueRad = 400; // Center of hue circle
+        let hueCenter = createVector(width / 2, height / 2); // Variable for the center of the circle of album covers
+    
+        let posVec = createVector(sin(albums[i].avgHue) * hueRad, cos(albums[i].avgHue) * hueRad); // 
+        posVec = posVec.mult(map(albums[i].avgLight, 0, 100, 0.5, 1.5));
+        posVec.add(hueCenter); // Places circle at defined center
+
+        image(albums[i].cover, posVec.x, posVec.y); // Display cover
+    }
+}
+
+function keyPressed() {
+    if (keyCode == SPACE_BAR) {
+        console.log('boo');
     }
 }
 
@@ -110,15 +124,16 @@ function setup() {
 
 class Album {
     constructor(index) {
-        this.cover = covers[index];
+        this.cover = covers[index]; // Set cover
         
-        let rawTitle = albumInv.getString(index, 1)
+        let rawTitle = albumInv.getString(index, 1); // Get title from albums.csv
         // Remove special characters used for API calls in setup script
         rawTitle = rawTitle.replaceAll('`', '');
         rawTitle = rawTitle.replaceAll('^', '');
-        this.title = rawTitle;
+        this.title = rawTitle; // Set title
 
-        let avgColour = this.calcAvgCol() // gets average colour array
+        let avgColour = this.calcAvgCol() // Gets array with cover's average colour in HSL
+
         this.avgHue = avgColour[0];
         this.avgSat = avgColour[1];
         this.avgLight = avgColour[2];
@@ -126,7 +141,7 @@ class Album {
         this.count = 0;
     }
 
-    // Calculates cover's average colour, returns array with hsl values
+    // Calculates cover's average colour, returns array with values in HSL
     calcAvgCol() {
         this.cover.loadPixels(); // Loads pixels from image
         let pix = this.cover.pixels; // reference to pixels
@@ -148,6 +163,7 @@ class Album {
 
             lightnesses += lightness(pixCol); // Adds lightness of current pixel
             //saturations += round(saturation(pixCol)); // Adds together saturations for displaying by saturation
+
             if (lightness(pixCol) > 10 && lightness(pixCol) < 90) { // If pixel isn't black or white
                 hues.add(createVector(cos(hue(pixCol)), sin(hue(pixCol)))) // Adds hue of current pixel
                 saturations += saturation(pixCol); // Adds saturation of current pixel
@@ -159,6 +175,6 @@ class Album {
         if (avgHue < 0) {avgHue += 360;} // atan2 returns an angle from -180 to 180, so this wraps the negative values back around
         let avgSat = saturations / (pix.length / 4); // Calculating average saturation
         let avgLight = lightnesses / (pix.length / 4); // Calculating average lightness
-        return [avgHue, avgSat, avgLight];
+        return [avgHue, avgSat, avgLight]; // Return colour
     }
 }
