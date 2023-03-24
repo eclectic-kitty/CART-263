@@ -1,7 +1,7 @@
 # Tone Colour
 #### Aurora Becerra Granados, for CART 263 at Concordia University, March 23d 2023
 
-![](/assets/images/screenshot.png)
+![](https://github.com/eclectic-kitty/CART-263/raw/main/data-viz/assets/images/screenshot.png)
 
 This project displays, by colour, the covers of albums from my personal music listening history over the one year period from March 11th 2022 to March 11th 2023. I was curious as to what could be gleaned about my music listening from the colours of my album covers. As will be discussed later, I didn't quite get far enough for that, but it remains interesting, in my opinion, to see what colours are prevalent in the covers of albums I listen to and how they are distributed.
 
