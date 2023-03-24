@@ -4,9 +4,6 @@ Script takes at least a few minutes to run, as the API calls & donwloading the i
 I've set it to only download 1500 covers at the time, as that is roughly the amount I've listened to in the past year
 */
 
-// My API key: fc29072d5368e2cf9e7b26a7b59da0f6
-// API URL: http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=fc29072d5368e2cf9e7b26a7b59da0f6&artist=" + + "&album=" + + "&format=json"
-
 let albumList; // variable to hold table with list of albums
 
 let artist; // variable to hold current artist
@@ -95,9 +92,8 @@ function displayCover (cover) {
 // Function that is called when a cover can't be fetched
 function wompWomp () {
     loadImage('assets/images/womp.png', displayCover); // Calls displayCover() and passes it a transparent image
-    // It will be displayed as the background colour, allowing me to easily identify the cover, but maintaining the index of the other covers
-    console.log('womp womp'); // Alerts user of the error via the console
-    console.log(artist + " - " + album); // Logs the name of the album that failed
+    // It will be displayed as the background colour, allowing it to be easily identified, but maintaining the index of the other covers
+    console.log('womp womp, ' + artist + " - " + album); // Alerts user of the error via the console & logs the name of the album that failed
 }
 
 // Downloads the canvas on a mouse click if done
