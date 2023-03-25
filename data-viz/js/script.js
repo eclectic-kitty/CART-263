@@ -7,18 +7,6 @@ The average hue, saturation and lightness of each cover is calculated
 The covers can then be displayed along any of these parameters
 */
 
-/*
-Extras:
-- switch between organising by saturation, lightness, and separate greyscale
-- y axis for quantity?
-- count changing size
-- larger things in the back
-
-When organising by saturation, saturation should not be calculated in black and white pixels
-I think hue doesn't make a big difference if separated
-
-*/
-
 let albums = []; // Array to contain album objects
 let albumInv; // Variable to contain albums index
 let covers = []; // Array to contain cover images
